@@ -1,4 +1,4 @@
-# Engineering CoP talk schedule
+# Engineering CoP Scheduler
 
 The schedule for the OHTP Engineering Community of Practice, at
 **https://dsacms.github.io/eng-cop/**. It shows what's on for each session and which dates still
