@@ -33,7 +33,7 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: format
+    id: talk-format
     attributes:
       label: Format
       description: Must be a format open on the date you chose.

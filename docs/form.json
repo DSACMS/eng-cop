@@ -39,7 +39,7 @@
       "maxLength": 120
     },
     {
-      "id": "format",
+      "id": "talk-format",
       "label": "Format",
       "type": "dropdown",
       "required": true,

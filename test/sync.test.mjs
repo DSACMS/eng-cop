@@ -45,7 +45,7 @@ function fakeGithub() {
   return {
     api, issues, comments, writes,
     open(number, values = {}, labels = ['talk']) {
-      const v = { format: formatOptionLabel(config.formats.lightning), ...values };
+      const v = { 'talk-format': formatOptionLabel(config.formats.lightning), ...values };
       issues.push({ number, title: 't', body: body(v), state: 'open', labels: labels.map((name) => ({ name })) });
     },
     has: (n, name) => issues.find((i) => i.number === n).labels.some((l) => l.name === name),
@@ -98,7 +98,7 @@ test('editing the second issue to a free slot clears the label and posts a new o
   gh.open(11);
   gh.open(12, { 'talk-title': 'Second' });
   await run(gh, { number: 12, action: 'opened' });
-  gh.issues[1].body = body({ 'talk-title': 'Second', 'session-date': '2026-11-05', format: formatOptionLabel(config.formats.lightning) });
+  gh.issues[1].body = body({ 'talk-title': 'Second', 'session-date': '2026-11-05', 'talk-format': formatOptionLabel(config.formats.lightning) });
   await run(gh, { number: 12, action: 'edited' });
   assert.ok(!gh.has(12, 'needs-reschedule'));
   assert.match(gh.lastComment(12), /Slot held/);

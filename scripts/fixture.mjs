@@ -34,7 +34,7 @@ export function buildFixture(today, config = loadConfig(), form = loadForm()) {
     number: ++n,
     state: 'open',
     labels: approved ? ['talk', 'approved'] : ['talk'],
-    body: body({ 'session-date': date, presenter, 'talk-title': title, format: formatOptionLabel(config.formats[format]), abstract: 'An abstract for the agenda.' })
+    body: body({ 'session-date': date, presenter, 'talk-title': title, 'talk-format': formatOptionLabel(config.formats[format]), abstract: 'An abstract for the agenda.' })
   });
 
   const issues = [

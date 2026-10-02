@@ -32,8 +32,8 @@ function toProposal(issue, form, config) {
   const date = oneLine(fields['session-date']);
   if (!isRealDate(date)) problems.push(`"${labelOf('session-date')}" must be a real date written YYYY-MM-DD, not "${date.slice(0, 40)}"`);
 
-  const format = formatKeyFromLabel(oneLine(fields.format), config);
-  if (!format) problems.push(`"${labelOf('format')}" must be one of: ${Object.keys(config.formats).join(', ')}`);
+  const format = formatKeyFromLabel(oneLine(fields['talk-format']), config);
+  if (!format) problems.push(`"${labelOf('talk-format')}" must be one of: ${Object.keys(config.formats).join(', ')}`);
 
   const presenter = oneLine(fields.presenter).replace(/^@/, '');
   if (presenter.includes('@')) problems.push('the presenter looks like an email address; use a GitHub username only');

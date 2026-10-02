@@ -26,7 +26,7 @@ export function body(values = {}) {
     'session-date': '2026-10-08',
     presenter: 'j-okafor',
     'talk-title': 'Load-testing a FHIR endpoint',
-    format: formatOptionLabel(config.formats.lightning),
+    'talk-format': formatOptionLabel(config.formats.lightning),
     abstract: '_No response_',
     ...values
   };
@@ -35,7 +35,8 @@ export function body(values = {}) {
 
 export function issue(number, values = {}, { labels = ['talk'], state = 'open' } = {}) {
   const v = { ...values };
-  if (v.format && config.formats[v.format]) v.format = formatOptionLabel(config.formats[v.format]);
+  // Tests write `format: 'lightning'` as shorthand for the form's talk-format answer.
+  if (v.format) { v['talk-format'] = formatOptionLabel(config.formats[v.format] ?? { label: v.format, minutes: 0 }); delete v.format; }
   return { number, title: `[Talk] ${v['talk-title'] ?? 'x'}`, body: body(v), labels, state };
 }
 

@@ -7,7 +7,13 @@ import { stringify } from 'yaml';
 import { ROOT, ConfigError } from './sessions.mjs';
 
 // The compiler depends on these five ids. Renaming one is a code change, not a form edit.
-export const REQUIRED_FIELD_IDS = ['session-date', 'presenter', 'talk-title', 'format', 'abstract'];
+export const REQUIRED_FIELD_IDS = ['session-date', 'presenter', 'talk-title', 'talk-format', 'abstract'];
+
+// Field ids become URL query parameters on github.com/<repo>/issues/new, which is a Rails app.
+// These names mean something to GitHub or to Rails itself, so a field using one breaks the form:
+// "format" selects the response type (any other value is HTTP 406), "title"/"labels"/"body" set the
+// issue itself. Hence "talk-title" and "talk-format".
+export const RESERVED_FIELD_IDS = ['format', 'title', 'body', 'labels', 'assignees', 'assignee', 'milestone', 'projects', 'template', 'type', 'id', 'action', 'controller', 'authenticity_token'];
 
 export const GENERATED_HEADER =
   '# GENERATED from docs/form.json and config.yml by scripts/gen-issue-template.mjs.\n' +
@@ -25,6 +31,8 @@ export function parseForm(json) {
   const ids = json.fields.map((f) => f.id);
   const dup = ids.find((id, i) => ids.indexOf(id) !== i);
   if (dup) throw new ConfigError(`docs/form.json: field id "${dup}" is used twice`);
+  const reserved = ids.find((id) => RESERVED_FIELD_IDS.includes(id));
+  if (reserved) throw new ConfigError(`docs/form.json: field id "${reserved}" is reserved by GitHub/Rails as a URL parameter; use something like "talk-${reserved}"`);
   for (const id of REQUIRED_FIELD_IDS) {
     if (!ids.includes(id)) throw new ConfigError(`docs/form.json: field "${id}" is required by the schedule compiler`);
   }

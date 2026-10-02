@@ -622,7 +622,7 @@ function render() {
 /* ==========================================================
    Drawer + form (fields come from form.json)
    ========================================================== */
-const PICKERS = ['session-date', 'format'];
+const PICKERS = ['session-date', 'talk-format'];
 const fieldDef = (id) => state.form.fields.find((f) => f.id === id);
 const dynamicFields = () => state.form.fields.filter((f) => !PICKERS.includes(f.id));
 const fieldEl = (id) => document.getElementById('f-' + id);
@@ -742,7 +742,7 @@ function submitProposal(e) {
   e.preventDefault();
   if ($('#submit-btn').disabled) return;
   const { date, format } = state.pick;
-  const values = { 'session-date': date, format: fullLabel(format) };
+  const values = { 'session-date': date, 'talk-format': fullLabel(format) };
   for (const f of dynamicFields()) values[f.id] = valueOf(f.id);
 
   const url = issueUrl(values);
