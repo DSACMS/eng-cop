@@ -21,6 +21,7 @@
   "sessions": [
     {
       "date": "2026-10-16",
+      "cancelled": "Backed out",
       "layout": "default",
       "slots": [
         {

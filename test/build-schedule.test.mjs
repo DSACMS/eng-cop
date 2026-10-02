@@ -160,7 +160,19 @@ test('invalid fields are reported with what to fix', () => {
 test('an unknown format label is reported', () => {
   const bad = issue(6);
   bad.body = bad.body.replace('Lightning talk (20 min)', 'Keynote (90 min)');
-  assert.match(compile([bad]).results[0].detail.problems.join(' '), /Format/);
+  const problems = compile([bad]).results[0].detail.problems.join(' ');
+  assert.match(problems, /Format/);
+  assert.match(problems, /Lightning talk \(20 min\) \/ Presentation \(30 min\) \/ Full session \(50 min\)/, 'lists the exact options to type');
+});
+
+test('changing the format of an approved talk by editing the issue moves it to the new slot, keeping approval', () => {
+  const approved = issue(5, { format: 'lightning' }, { labels: ['talk', 'approved'] });
+  assert.equal(slot(compile([approved]).schedule, '2026-10-08', 'lightning').state, 'scheduled');
+  const edited = { ...approved, body: approved.body.replace('Lightning talk (20 min)', 'Presentation') };
+  const { schedule } = compile([edited]);
+  assert.equal(slot(schedule, '2026-10-08', 'lightning').state, 'open', 'old slot is freed');
+  assert.equal(slot(schedule, '2026-10-08', 'presentation').state, 'scheduled');
+  assert.equal(slot(schedule, '2026-10-08', 'presentation').issue, 5);
 });
 
 test('only open issues labelled talk count; closed and withdrawn free the slot', () => {

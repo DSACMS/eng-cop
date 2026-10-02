@@ -43,8 +43,16 @@ export function parseIssueBody(body, form) {
   return { fields, missing };
 }
 
-/** Map a dropdown answer ("Lightning talk (20 min)") back to its format key. */
+/**
+ * Map a format answer back to its key. The issue form gives "Lightning talk (20 min)", but a
+ * speaker editing the issue by hand may type "Lightning talk" or "lightning", so accept all
+ * three, ignoring case and spacing.
+ */
 export function formatKeyFromLabel(label, config) {
-  const entry = Object.entries(config.formats).find(([, f]) => formatOptionLabel(f) === label);
+  const norm = (s) => String(s ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+  const answer = norm(label);
+  if (!answer) return null;
+  const entry = Object.entries(config.formats).find(([key, f]) =>
+    [key, f.label, formatOptionLabel(f)].some((candidate) => norm(candidate) === answer));
   return entry ? entry[0] : null;
 }

@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import {
   ROOT, ConfigError, loadConfig, loadSessions, isRealDate, todayIn
 } from './sessions.mjs';
-import { loadForm } from './form.mjs';
+import { loadForm, formatOptionLabel } from './form.mjs';
 import { parseIssueBody, formatKeyFromLabel } from './parse-issue.mjs';
 
 export const LABELS = { talk: 'talk', approved: 'approved', withdrawn: 'withdrawn', reschedule: 'needs-reschedule' };
@@ -33,7 +33,7 @@ function toProposal(issue, form, config) {
   if (!isRealDate(date)) problems.push(`"${labelOf('session-date')}" must be a real date written YYYY-MM-DD, not "${date.slice(0, 40)}"`);
 
   const format = formatKeyFromLabel(oneLine(fields['talk-format']), config);
-  if (!format) problems.push(`"${labelOf('talk-format')}" must be one of: ${Object.keys(config.formats).join(', ')}`);
+  if (!format) problems.push(`"${labelOf('talk-format')}" must be one of: ${Object.values(config.formats).map(formatOptionLabel).join(' / ')}`);
 
   const presenter = oneLine(fields.presenter).replace(/^@/, '');
   if (presenter.includes('@')) problems.push('the presenter looks like an email address; use a GitHub username only');

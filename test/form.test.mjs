@@ -77,3 +77,11 @@ test('no field id is a name GitHub or Rails treats specially (the "format" id ca
   bad.fields.find((f) => f.id === 'talk-format').id = 'format';
   assert.throws(() => parseForm(bad), /reserved/);
 });
+
+test('a speaker editing the issue by hand can write the format as the full option, the short name, or the key', () => {
+  for (const answer of ['Presentation (30 min)', 'Presentation', 'presentation', '  PRESENTATION  ']) {
+    assert.equal(formatKeyFromLabel(answer, config), 'presentation', answer);
+  }
+  assert.equal(formatKeyFromLabel('Keynote', config), null);
+  assert.equal(formatKeyFromLabel('', config), null);
+});
