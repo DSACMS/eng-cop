@@ -1,0 +1,58 @@
+{
+  "template": {
+    "name": "Propose a talk",
+    "description": "Take an open slot at the Engineering CoP. An admin confirms every talk before it joins the agenda.",
+    "titlePrefix": "[Talk] ",
+    "labels": [
+      "talk"
+    ],
+    "intro": "Everything on this page is public on GitHub. Use your GitHub username only, with no email addresses. Prefer the schedule site: it fills this form in for you.",
+    "templateFile": "talk.yml"
+  },
+  "fields": [
+    {
+      "id": "session-date",
+      "label": "Session date",
+      "type": "input",
+      "required": true,
+      "placeholder": "2026-10-16",
+      "help": "The date of an upcoming session with an open slot, as YYYY-MM-DD."
+    },
+    {
+      "id": "presenter",
+      "label": "GitHub username",
+      "type": "input",
+      "required": true,
+      "placeholder": "your-handle",
+      "prefix": "@",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$",
+      "patternMessage": "That doesn't look like a GitHub username.",
+      "help": "Who is presenting. Admins filing for someone without an account may write their name here.",
+      "maxLength": 60
+    },
+    {
+      "id": "talk-title",
+      "label": "Talk title",
+      "type": "input",
+      "required": true,
+      "placeholder": "What you'll cover, in a line",
+      "maxLength": 120
+    },
+    {
+      "id": "format",
+      "label": "Format",
+      "type": "dropdown",
+      "required": true,
+      "optionsFrom": "formats",
+      "help": "Must be a format open on the date you chose."
+    },
+    {
+      "id": "abstract",
+      "label": "Abstract",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "A few sentences for the agenda.",
+      "maxLength": 2000
+    }
+  ]
+}

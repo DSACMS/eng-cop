@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engineering CoP · Talk schedule</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230071BC'/%3E%3Cpath d='M8 12h16M8 12v10h16V12M12 9v4M20 9v4' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --blue: #0071BC;
+    --blue-hover: #005A96;
+    --blue-text: #0062A3;
+    --blue-tint: #F1F7FC;
+    --ink: #1B2631;
+    --ink-2: #33414D;
+    --muted: #5A6772;
+    --faint: #7A8691;
+    --line: #E3E8EC;
+    --line-strong: #C9D3DB;
+    --amber-bg: #FFF1DC;
+    --amber-text: #8A4B00;
+    --green: #1F6B3A;
+    --sans: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --ease: cubic-bezier(.2,.7,.2,1);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: #fff; color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; }
+  a { color: var(--blue-text); text-underline-offset: 3px; }
+  a:hover { color: #004B7C; }
+  h1, h2, p { margin: 0; }
+  button { font: inherit; }
+  :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+  /* ---------- Motion ---------- */
+  @keyframes rise   { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes grow   { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes drift  { from { background-position: 0 0; } to { background-position: 10px 0; } }
+  @keyframes fade   { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slide  { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+  @keyframes reveal { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  @keyframes draw   { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+  @keyframes pop    { 0% { transform: scale(.5); opacity: 0; } 65% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); } }
+  @keyframes ping   { 0% { transform: scale(1); opacity: .5; } 100% { transform: scale(2.8); opacity: 0; } }
+  .rise   { animation: rise .6s var(--ease) both; }
+  .reveal { animation: reveal .35s var(--ease) both; }
+
+  /* ---------- Hour strip: round robin, then slots ---------- */
+  .strip { display: flex; gap: 3px; height: 8px; }
+  .seg { height: 100%; border-radius: 3px; transform-origin: left center; }
+  .seg.animate { animation: grow .7s var(--ease) both; }
+  .seg-base { background: #E6EBEF; }
+  .seg-mid { background: #D7DFE5; }
+  .seg-off { background: #F0F2F4; }
+  .seg-approved { background: var(--blue); }
+  .stripes {
+    background-image: linear-gradient(135deg, var(--stripe) 25%, transparent 25%, transparent 50%, var(--stripe) 50%, var(--stripe) 75%, transparent 75%);
+    background-size: 10px 10px;
+  }
+  .seg-pending { --stripe: rgba(255,255,255,.5); background-color: #F2B65A; }
+  .seg-open { --stripe: rgba(0,113,188,.34); background-color: #fff; box-shadow: inset 0 0 0 1px #8DB6D6; }
+  .seg-open, .seg-open.animate { animation: drift 2.4s linear infinite; }
+  .seg-open.animate { animation: grow .7s var(--ease) both, drift 2.4s linear infinite; }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid transparent;
+    font-size: 14.5px; font-weight: 600; text-decoration: none; white-space: nowrap; cursor: pointer;
+    transition: background .2s, border-color .2s, transform .2s, box-shadow .2s;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: none; }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: var(--blue-hover); color: #fff; box-shadow: 0 6px 16px rgba(0,90,150,.22); }
+  .btn-primary:disabled { background: #9FBFD8; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-ghost { background: #fff; border-color: var(--line-strong); color: var(--ink); }
+  .btn-ghost:hover { background: #F4F7F9; color: var(--ink); }
+  .btn-claim { background: #fff; border-color: var(--blue); color: var(--blue-text); }
+  .btn-claim:hover { background: #EAF3FA; color: #004B7C; }
+  .icon-btn {
+    width: 44px; height: 44px; flex: none; display: inline-flex; align-items: center; justify-content: center;
+    border: 0; border-radius: 10px; background: transparent; color: var(--ink-2); cursor: pointer; transition: background .2s;
+  }
+  .icon-btn:hover { background: #F1F4F6; }
+  .pill {
+    height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-strong);
+    background: #fff; color: var(--ink); font-size: 14px; font-weight: 500; cursor: pointer;
+    transition: background .2s, border-color .2s, color .2s, transform .2s;
+  }
+  .pill:hover { border-color: var(--blue); }
+  .pill[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; transform: scale(1.03); }
+
+  .chip { display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; }
+  .chip-pending { background: var(--amber-bg); color: var(--amber-text); height: 26px; padding: 0 10px; }
+  .chip-muted { background: #F1F4F6; color: var(--muted); }
+  .tag { font-size: 12.5px; font-weight: 600; color: var(--ink-2); background: #F1F4F6; border-radius: 999px; padding: 4px 10px; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: #E3EEF7; color: var(--blue-text);
+    font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; flex: none;
+  }
+  .avatars { display: flex; }
+  .avatars .avatar + .avatar { margin-left: -8px; box-shadow: 0 0 0 2px #fff; }
+  .mono { font-family: var(--mono); }
+
+  /* ---------- Layout ---------- */
+  .topbar { height: 3px; background: var(--blue); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px 64px; }
+
+  .site-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    padding: 20px 0; border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark { width: 34px; height: 34px; border-radius: 9px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex: none; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.25; }
+  .brand-text strong { font-size: 15px; }
+  .brand-text span { font-size: 12.5px; color: var(--muted); }
+  .header-actions { display: flex; align-items: center; gap: 20px; }
+  .header-actions a { font-size: 14px; font-weight: 500; }
+
+  .intro { padding: 40px 0 28px; display: flex; flex-direction: column; gap: 8px; animation-delay: 60ms; }
+  .intro h1 { font-size: 36px; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; }
+  .intro p { max-width: 560px; color: var(--muted); font-size: 16px; }
+
+  /* Hero */
+  .hero {
+    border: 1px solid #DCE3E9; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 24px;
+    box-shadow: 0 1px 2px rgba(16,32,48,.04), 0 12px 32px rgba(16,32,48,.05); animation-delay: 140ms;
+  }
+  .hero-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 16px; }
+  .live { display: flex; align-items: center; gap: 4px 10px; flex-wrap: wrap; }
+  .dot { position: relative; width: 10px; height: 10px; display: inline-block; }
+  .dot span { position: absolute; inset: 0; border-radius: 50%; background: var(--blue); }
+  .dot .ping { animation: ping 2s cubic-bezier(0,.4,.6,1) infinite; }
+  .live-label { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--blue-text); }
+  .live-when { font-size: 13px; color: var(--muted); }
+  .hero-talks { display: flex; flex-wrap: wrap; gap: 24px 40px; }
+  .talk { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .talk h2 { font-size: 26px; line-height: 1.25; font-weight: 700; letter-spacing: -0.015em; }
+  .talk.is-open h2 { color: var(--muted); font-weight: 600; }
+  .presenter { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .presenter strong { font-size: 14.5px; }
+  .hero .btn-primary { height: 48px; padding: 0 22px; }
+  .hero-strip { display: flex; gap: 4px; }
+  .hero-strip .col { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .hero-strip .seg { height: 10px; }
+  .hero-strip .off { font-size: 12px; color: var(--muted); }
+  .hero-strip .name { font-size: 12.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+
+  /* Upcoming */
+  .upcoming { margin-top: 52px; }
+  .upcoming-head {
+    display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    padding-bottom: 14px; border-bottom: 1px solid var(--line); animation-delay: 220ms;
+  }
+  .upcoming-head h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .legend { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .legend strong { color: var(--ink); font-weight: 600; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 16px; height: 8px; border-radius: 2px; display: inline-block; }
+
+  .row { border-bottom: 1px solid var(--line); padding: 0 10px; transition: background .25s ease; }
+  .row:hover { background: #F7FAFC; }
+  .row.is-off:hover { background: transparent; }
+  .row-main { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 18px 0; }
+  .date { width: 52px; flex: none; display: flex; flex-direction: column; line-height: 1.1; }
+  .date .mon { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--blue-text); }
+  .date .day { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .date .dow { font-size: 12px; color: var(--muted); }
+  .is-off .date .mon, .is-off .date .day { color: var(--faint); }
+
+  .toggle {
+    all: unset; box-sizing: border-box; cursor: pointer; border-radius: 8px;
+    flex: 1 1 380px; min-width: 0; display: flex; align-items: center; gap: 16px; text-align: left;
+  }
+  .toggle:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+  .summary { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .toggle .summary { flex: 1 1 auto; }
+  .titles { display: flex; flex-direction: column; gap: 10px; }
+  .line { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .line .t { font-size: 16px; font-weight: 600; }
+  .line .m { font-size: 13.5px; color: var(--muted); }
+  .line.is-quiet .t { color: var(--muted); }
+  .is-off .strip { margin-right: 36px; }
+  .chev { flex: none; transition: transform .3s var(--ease); }
+  .toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  .action { width: 156px; flex: none; display: flex; justify-content: flex-end; }
+
+  .agenda-wrap { padding: 0 0 22px 76px; }
+  .agenda { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; }
+  .agenda-item { display: flex; align-items: center; gap: 16px; padding: 12px 16px; }
+  .agenda-item + .agenda-item { border-top: 1px solid var(--line); }
+  .agenda-item .off { font-size: 13px; color: var(--muted); width: 30px; flex: none; }
+  .agenda-item .what { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+  .agenda-item .what b { font-size: 14.5px; font-weight: 400; }
+  .agenda-item.is-claim .what b { font-weight: 600; }
+  .agenda-item .what span, .agenda-item .len { font-size: 13px; color: var(--muted); }
+  .agenda-item .len { flex: none; }
+  .agenda-item.claim-scheduled { background: var(--blue-tint); }
+  .agenda-item.claim-pending { background: #FFF8EE; }
+  .agenda-item.claim-open { background: #FAFCFE; }
+  .edit-link { display: inline-flex; margin-top: 12px; font-size: 13px; font-weight: 500; }
+
+  .site-footer {
+    margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted);
+  }
+
+  /* ---------- Drawer ---------- */
+  .drawer-root { position: fixed; inset: 0; z-index: 20; }
+  .drawer-root[hidden] { display: none; }
+  .scrim { position: absolute; inset: 0; background: rgba(16,32,48,.32); animation: fade .3s ease both; }
+  .drawer {
+    position: absolute; top: 0; right: 0; bottom: 0; width: min(460px, 100%); background: #fff;
+    box-shadow: -24px 0 48px rgba(16,32,48,.14); overflow-y: auto; padding: 28px;
+    animation: slide .45s var(--ease) both;
+  }
+  .panel { display: flex; flex-direction: column; gap: 24px; }
+  .panel[hidden] { display: none; }
+  .drawer-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .drawer-head > div { display: flex; flex-direction: column; gap: 6px; }
+  .drawer h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .drawer-head p { color: var(--muted); font-size: 14px; }
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  legend, .label { padding: 0; margin-bottom: 10px; font-size: 13.5px; font-weight: 600; display: block; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .help { margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+  .pills .help { margin: 0; }
+  .field-group { display: flex; flex-direction: column; }
+  .field-group .label { margin-bottom: 8px; }
+  .field {
+    width: 100%; font: inherit; font-size: 15px; padding: 11px 12px; border: 1px solid #B5C1CB; border-radius: 10px;
+    background: #fff; color: var(--ink); transition: border-color .2s, box-shadow .2s;
+  }
+  .field::placeholder { color: var(--faint); }
+  .field:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0,113,188,.16); }
+  textarea.field { resize: vertical; }
+  .prefixed { position: relative; }
+  .prefixed span { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  .prefixed .field { padding-left: 30px; }
+  .status { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12.5px; color: var(--muted); min-height: 19px; }
+  .status.ok { color: var(--green); }
+  .status.bad { color: #A33A00; }
+  .slot-note { padding: 12px 14px; border-radius: 10px; background: var(--blue-tint); font-size: 13.5px; color: var(--ink-2); }
+  .notice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 10px; background: #F4F6F8; font-size: 13px; color: var(--ink-2); }
+  .notice svg { flex: none; margin-top: 2px; }
+  .submit { display: flex; flex-direction: column; gap: 10px; }
+  .submit .btn { height: 50px; width: 100%; }
+  .submit span { font-size: 13px; color: var(--muted); text-align: center; }
+  .fallback { padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+
+  .done-close { display: flex; justify-content: flex-end; }
+  .done-icon {
+    width: 60px; height: 60px; border-radius: 50%; background: #E6F2EA; display: flex; align-items: center; justify-content: center;
+    animation: pop .5s var(--ease) both;
+  }
+  .done-icon path { stroke-dasharray: 24; animation: draw .5s .3s ease both; }
+  .done-text { display: flex; flex-direction: column; gap: 8px; }
+  .done-text h2 { font-size: 24px; }
+  .done-text p { color: var(--muted); font-size: 14.5px; }
+  .summary-card { border: 1px solid var(--line); border-radius: 12px; margin: 0; }
+  .summary-card div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 16px; }
+  .summary-card div + div { border-top: 1px solid var(--line); }
+  .summary-card dt { color: var(--muted); font-size: 13.5px; }
+  .summary-card dd { margin: 0; font-weight: 600; font-size: 14px; text-align: right; }
+  .done-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .done-note { font-size: 13px; color: var(--muted); }
+
+  body.locked { overflow: hidden; }
+
+  /* ---------- Small screens ---------- */
+  @media (max-width: 640px) {
+    .wrap { padding: 0 18px 48px; }
+    .intro { padding: 28px 0 20px; }
+    .intro h1 { font-size: 30px; }
+    .hero { padding: 20px; border-radius: 14px; }
+    .talk h2 { font-size: 22px; }
+    .hero-top .btn { width: 100%; }
+    .row { padding: 0 2px; }
+    .action { width: auto; margin-left: 76px; justify-content: flex-start; }
+    .agenda-wrap { padding-left: 0; }
+    .header-actions a { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  /* ---------- Added for the real site ---------- */
+  .notice-box { border: 1px solid var(--line-strong); border-radius: 12px; padding: 20px; background: #F7FAFC; color: var(--ink-2); }
+  .notice-box strong { display: block; margin-bottom: 4px; color: var(--ink); }
+  .cadence { color: var(--muted); font-size: 14px; }
+  .field-group .optional { font-weight: 400; color: var(--muted); }
+  .done-link { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+
+<div class="wrap" id="page">
+  <header class="site-header rise">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7 15h4"/></svg>
+      </div>
+      <div class="brand-text">
+        <strong>Engineering CoP</strong>
+        <span>Office of Health &amp; Technology Products</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a id="repo-link" href="#">GitHub repo</a>
+      <button class="btn btn-ghost" type="button" data-action="claim-any" id="propose-btn" disabled>Propose a talk</button>
+    </div>
+  </header>
+
+  <div class="intro rise">
+    <h1>Talk schedule</h1>
+    <p>What's on, and which dates still need a speaker. The meeting itself lives in your Outlook calendar.</p>
+    <p class="cadence" id="cadence"></p>
+  </div>
+
+  <section class="hero rise" id="hero" aria-label="Next session" aria-live="polite">
+    <p>Loading the schedule…</p>
+  </section>
+
+  <section class="upcoming" id="upcoming" aria-labelledby="upcoming-title" hidden>
+    <div class="upcoming-head rise">
+      <h2 id="upcoming-title">Upcoming</h2>
+      <div class="legend">
+        <strong id="open-count"></strong>
+        <span><i class="seg-approved"></i>Talk</span>
+        <span><i class="seg-pending stripes"></i>Pending</span>
+        <span><i class="seg-open stripes"></i>Open</span>
+      </div>
+    </div>
+    <div id="list"></div>
+  </section>
+
+  <footer class="site-footer">
+    <span>An agenda for the recurring Outlook series. Talks come from approved GitHub issues.</span>
+    <span>No GitHub account? <span class="ospo-fallback">Email your OSPO contact</span> and an admin will file it for you.</span>
+  </footer>
+</div>
+
+<!-- Proposal drawer -->
+<div class="drawer-root" id="drawer" hidden>
+  <div class="scrim" data-action="close"></div>
+  <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+
+    <form class="panel" id="form-panel" novalidate>
+      <div class="drawer-head">
+        <div>
+          <h2 id="drawer-title">Propose a talk</h2>
+          <p>Pick an open slot and tell us what you'll cover. An admin confirms every talk before it joins the agenda.</p>
+        </div>
+        <button class="icon-btn" type="button" aria-label="Close" data-action="close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <fieldset>
+        <legend>Date</legend>
+        <div class="pills" id="date-pills"></div>
+        <p class="help">Only dates with an open slot are listed.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Format</legend>
+        <div class="pills" id="format-pills"></div>
+        <p class="help">Only formats open on this date are listed.</p>
+      </fieldset>
+
+      <p class="slot-note" id="slot-note" aria-live="polite"></p>
+
+      <!-- Remaining fields are rendered from form.json -->
+      <div class="panel" id="dynamic-fields"></div>
+
+      <div class="notice">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>Everything here is public on GitHub. Use your handle only — no email addresses.</span>
+      </div>
+
+      <div class="submit">
+        <button class="btn btn-primary" type="submit" id="submit-btn" disabled>
+          Continue to GitHub
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </button>
+        <span>Opens a prefilled issue. You'll confirm on GitHub in one click.</span>
+      </div>
+
+      <p class="fallback">No GitHub account? <span class="ospo-fallback">Email your OSPO contact</span> with your date, format and title, and an admin will file it for you.</p>
+    </form>
+
+    <div class="panel" id="done-panel" hidden>
+      <div class="done-close">
+        <button class="icon-btn" type="button" aria-label="Close" data-action="close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div id="done-body"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ==========================================================
+   Data: one compiled schedule + the form definition. Both are
+   plain JSON next to this page; nothing else is requested.
+   ========================================================== */
+const DATA_URL = 'data/schedule.json';
+const FORM_URL = 'form.json';
+
+const state = {
+  data: null,
+  form: null,
+  formats: {},
+  repo: '',
+  sessions: [],
+  hero: null,
+  expanded: null,
+  justExpanded: null,
+  firstPaint: true,
+  drawerOpen: false,
+  returnFocus: null,
+  pick: { date: null, format: null }
+};
+
+const $ = (sel, root = document) => root.querySelector(sel);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = (n) => String(n).padStart(2, '0');
+const offset = (m) => ':' + pad(m);
+// Only ever link to https URLs, whatever the data says.
+const safeUrl = (u) => (/^https:\/\/\S+$/.test(String(u ?? '')) ? u : '#');
+
+const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function parts(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  return { d, dow: DOW[d.getDay()], mon: MON[d.getMonth()], day: d.getDate() };
+}
+const shortDate = (iso) => { const p = parts(iso); return `${p.dow} ${p.mon} ${p.day}`; };
+function relative(iso) {
+  const today = new Date(); today.setHours(12, 0, 0, 0);
+  const days = Math.round((parts(iso).d - today) / 86400000);
+  if (days > 1) return `in ${days} days`;
+  if (days === 1) return 'tomorrow';
+  if (days === 0) return 'today';
+  return '';
+}
+
+const FORMAT_FALLBACK = { label: 'Talk', short: 'Talk', minutes: 0 };
+const fmt = (k) => state.formats[k] || FORMAT_FALLBACK;
+const fullLabel = (k) => `${fmt(k).label} (${fmt(k).minutes} min)`; // must equal the issue template's option text
+const talkSlots = (s) => (s.slots || []).filter((x) => x.kind === 'talk');
+const openSlots = (s) => talkSlots(s).filter((x) => x.state === 'open');
+const sessionByDate = (d) => state.sessions.find((s) => s.date === d);
+
+// A GitHub username shows as @name; a plain name (filed by an admin) shows as written.
+const HANDLE_RE = /^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$/;
+const who = (p) => (HANDLE_RE.test(p) ? '@' + p : p);
+const initial = (p) => String(p || '?').charAt(0).toUpperCase();
+
+const ICON = {
+  chev: '<svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6772" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
+  out: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>',
+  ok: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  warn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/></svg>'
+};
+
+function slotClass(sl) {
+  if (sl.kind === 'round-robin') return 'seg seg-base';
+  if (sl.kind === 'discussion') return 'seg seg-mid';
+  if (sl.state === 'scheduled') return 'seg seg-approved';
+  if (sl.state === 'pending') return 'seg seg-pending stripes';
+  return 'seg seg-open stripes';
+}
+
+/* ==========================================================
+   Render: next session
+   ========================================================== */
+function renderHero() {
+  const s = state.hero;
+  const el = $('#hero');
+  if (!s) { el.innerHTML = '<p>No upcoming sessions are listed yet.</p>'; return; }
+  const when = relative(s.date);
+  const anim = state.firstPaint;
+
+  const talks = talkSlots(s).map((t) => {
+    if (t.state === 'open') {
+      return `<div class="talk is-open">
+        <span class="tag">${esc(fullLabel(t.format))}</span>
+        <h2>Open slot</h2>
+        <button class="btn btn-claim" type="button" data-action="claim" data-id="${esc(s.date)}" data-format="${esc(t.format)}">Take this slot</button>
+      </div>`;
+    }
+    return `<div class="talk">
+      <span class="tag">${esc(fullLabel(t.format))}</span>
+      <h2>${esc(t.title)}</h2>
+      <div class="presenter">
+        <span class="avatar" aria-hidden="true">${esc(initial(t.presenter))}</span>
+        <strong>${esc(who(t.presenter))}</strong>
+        ${t.state === 'pending' ? '<span class="chip chip-pending">Pending</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  const cols = s.slots.map((sl, j) => {
+    const name = sl.kind === 'round-robin' ? 'Round robin'
+      : sl.kind === 'discussion' ? 'Discussion'
+      : sl.state === 'open' ? `Open · ${fmt(sl.format).label}` : fmt(sl.format).label;
+    return `<div class="col" style="flex:${sl.to - sl.from} 1 0">
+      <div class="${slotClass(sl)}${anim ? ' animate' : ''}" style="animation-delay:${240 + j * 90}ms"></div>
+      <span class="off mono">${offset(sl.from)}</span>
+      <span class="name">${esc(name)}</span>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="hero-top">
+      <div class="live">
+        <span class="dot" aria-hidden="true"><span class="ping"></span><span></span></span>
+        <span class="live-label">Next session</span>
+        <span class="live-when">${when ? when + ' · ' : ''}${esc(shortDate(s.date))} · 60 min</span>
+      </div>
+    </div>
+    <div class="hero-talks">${talks}</div>
+    <div class="hero-strip" aria-hidden="true">${cols}</div>`;
+}
+
+/* ==========================================================
+   Render: upcoming list
+   ========================================================== */
+function rowHTML(s, i) {
+  const p = parts(s.date);
+  const off = !!s.cancelled;
+  const talks = talkSlots(s);
+  const open = openSlots(s);
+  const expanded = !off && state.expanded === s.date;
+  const anim = state.firstPaint;
+
+  const lines = off
+    ? `<div class="line is-quiet"><span class="t">No session</span><span class="m">${esc(s.cancelled)}</span></div>`
+    : talks.map((t) => {
+        if (t.state === 'open') return `<div class="line is-quiet"><span class="t">Open slot</span><span class="m">${esc(fullLabel(t.format))}</span></div>`;
+        return `<div class="line"><span class="t">${esc(t.title)}</span><span class="m">${esc(who(t.presenter))} · ${esc(fmt(t.format).label)}${t.state === 'pending' ? ' · awaiting approval' : ''}</span></div>`;
+      }).join('');
+
+  const slots = off ? [{ kind: 'off', from: 0, to: 60 }] : s.slots;
+  const strip = `<div class="strip" aria-hidden="true">${slots.map((sl, j) =>
+    `<div class="${sl.kind === 'off' ? 'seg seg-off' : slotClass(sl)}${anim ? ' animate' : ''}" style="flex:${sl.to - sl.from} 1 0;animation-delay:${440 + i * 70 + j * 50}ms"></div>`).join('')}</div>`;
+  const summary = `<div class="summary"><div class="titles">${lines}</div>${strip}</div>`;
+
+  let action = '';
+  if (off) action = '<span class="chip chip-muted">Skipped</span>';
+  else if (open.length) action = `<button class="btn btn-claim" type="button" data-action="claim" data-id="${esc(s.date)}" data-format="${esc(open[0].format)}">${open.length === 1 ? 'Take this slot' : 'Take a slot'}</button>`;
+  else if (talks.some((t) => t.state === 'pending')) action = '<span class="chip chip-pending">Pending</span>';
+  else action = `<span class="avatars">${talks.map((t) => `<span class="avatar" title="${esc(who(t.presenter))}" aria-hidden="true">${esc(initial(t.presenter))}</span>`).join('')}</span>`;
+
+  let agenda = '';
+  if (expanded) {
+    const items = s.slots.map((sl) => {
+      const len = sl.to - sl.from;
+      let line, sub = '', cls = '', btn = '';
+      if (sl.kind === 'round-robin') { line = 'Round robin'; sub = 'Everyone gets a turn'; }
+      else if (sl.kind === 'discussion') { line = 'Open discussion'; }
+      else {
+        cls = ` is-claim claim-${sl.state}`;
+        if (sl.state === 'open') {
+          line = `${fmt(sl.format).label} — open`;
+          sub = `Take it and these ${len} minutes are yours.`;
+          btn = `<button class="btn btn-claim" type="button" data-action="claim" data-id="${esc(s.date)}" data-format="${esc(sl.format)}">Take it</button>`;
+        } else {
+          line = sl.title;
+          sub = `${who(sl.presenter)} · ${fmt(sl.format).label}${sl.state === 'pending' ? ' · pending' : ''}`;
+        }
+      }
+      return `<div class="agenda-item${cls}">
+        <span class="off mono">${offset(sl.from)}</span>
+        <div class="what"><b>${esc(line)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}</div>
+        <span class="len">${len} min</span>${btn}
+      </div>`;
+    }).join('');
+    const mine = talks.find((t) => t.state !== 'open');
+    const edit = mine ? `<a class="edit-link" href="${esc(safeUrl(mine.url))}">Presenting? Edit your proposal on GitHub</a>` : '';
+    agenda = `<div class="agenda-wrap${state.justExpanded === s.date ? ' reveal' : ''}" id="agenda-${esc(s.date)}"><div class="agenda">${items}</div>${edit}</div>`;
+  }
+
+  const main = off
+    ? summary
+    : `<button class="toggle" type="button" data-action="toggle" data-id="${esc(s.date)}" aria-expanded="${expanded}" aria-controls="agenda-${esc(s.date)}">${summary}${ICON.chev}</button>`;
+
+  return `<div class="row${anim ? ' rise' : ''}${off ? ' is-off' : ''}" style="animation-delay:${280 + i * 70}ms">
+    <div class="row-main">
+      <div class="date"><span class="mon">${p.mon}</span><span class="day">${p.day}</span><span class="dow">${p.dow}</span></div>
+      ${main}
+      <div class="action">${action}</div>
+    </div>
+    ${agenda}
+  </div>`;
+}
+
+function renderList() {
+  const rest = state.sessions.filter((s) => !state.hero || s.date > state.hero.date);
+  $('#list').innerHTML = rest.map(rowHTML).join('');
+  $('#upcoming').hidden = rest.length === 0;
+  const active = state.sessions.filter((s) => !s.cancelled);
+  const needing = active.filter((s) => openSlots(s).length).length;
+  $('#open-count').textContent = `${needing} of ${active.length} sessions have an open slot`;
+}
+
+function render() {
+  renderHero();
+  renderList();
+  state.firstPaint = false;
+  state.justExpanded = null;
+}
+
+/* ==========================================================
+   Drawer + form (fields come from form.json)
+   ========================================================== */
+const PICKERS = ['session-date', 'format'];
+const fieldDef = (id) => state.form.fields.find((f) => f.id === id);
+const dynamicFields = () => state.form.fields.filter((f) => !PICKERS.includes(f.id));
+const fieldEl = (id) => document.getElementById('f-' + id);
+const datesWithOpen = () => state.sessions.filter((s) => !s.cancelled && openSlots(s).length);
+const formatsOpenOn = (d) => { const s = sessionByDate(d); return s ? [...new Set(openSlots(s).map((x) => x.format))] : []; };
+
+function buildFields() {
+  $('#dynamic-fields').innerHTML = dynamicFields().map((f) => {
+    const id = 'f-' + f.id;
+    const label = `<label class="label" for="${id}">${esc(f.label)}${f.required ? '' : ' <span class="optional">(optional)</span>'}</label>`;
+    const max = f.maxLength ? ` maxlength="${f.maxLength}"` : '';
+    const common = `id="${id}" class="field" data-field="${esc(f.id)}"${max} placeholder="${esc(f.placeholder || '')}"`;
+    let control;
+    if (f.type === 'textarea') control = `<textarea ${common} rows="4"></textarea>`;
+    else if (f.prefix) control = `<div class="prefixed"><span aria-hidden="true">${esc(f.prefix)}</span><input ${common} autocomplete="off" spellcheck="false" autocapitalize="off" aria-describedby="${id}-status"></div>`;
+    else control = `<input ${common} autocomplete="off">`;
+    // A field with a pattern gets a live status line; others show their help text.
+    const foot = f.pattern
+      ? `<div class="status" id="${id}-status" aria-live="polite"></div>`
+      : (f.help ? `<p class="help">${esc(f.help)}</p>` : '');
+    return `<div class="field-group">${label}${control}${foot}</div>`;
+  }).join('');
+}
+
+function slotNote() {
+  const { date, format } = state.pick;
+  if (!date || !format) return 'Every upcoming slot is taken. Check back after the next session.';
+  const f = fmt(format);
+  return format === 'full'
+    ? `Takes the full ${f.minutes}-minute session on ${shortDate(date)}.`
+    : `Fills the ${f.minutes}-minute ${f.label.toLowerCase()} slot on ${shortDate(date)}.`;
+}
+
+function renderPills() {
+  const pick = state.pick;
+  const dates = datesWithOpen();
+  $('#date-pills').innerHTML = dates.length
+    ? dates.map((s) => `<button type="button" class="pill" data-date="${esc(s.date)}" aria-pressed="${s.date === pick.date}">${esc(shortDate(s.date))}</button>`).join('')
+    : '<span class="help">No dates have an open slot.</span>';
+  $('#format-pills').innerHTML = (pick.date ? formatsOpenOn(pick.date) : [])
+    .map((k) => `<button type="button" class="pill" data-format="${esc(k)}" aria-pressed="${k === pick.format}">${esc(fullLabel(k))}</button>`).join('');
+  $('#slot-note').textContent = slotNote();
+}
+
+const valueOf = (id) => {
+  const el = fieldEl(id);
+  const f = fieldDef(id);
+  let v = el ? el.value.trim() : '';
+  if (f.prefix && v.startsWith(f.prefix)) v = v.slice(f.prefix.length);
+  return v;
+};
+const patternOk = (f, v) => !f.pattern || new RegExp(f.pattern).test(v);
+
+function updateFormState() {
+  let ready = !!(state.pick.date && state.pick.format);
+  for (const f of dynamicFields()) {
+    const v = valueOf(f.id);
+    if (f.required && !v) ready = false;
+    if (f.pattern) {
+      const el = $('#f-' + f.id + '-status');
+      el.className = 'status';
+      if (!v) {
+        el.textContent = f.prefix ? 'The issue is filed under this account.' : '';
+        if (f.required) ready = false;
+      } else if (!patternOk(f, v)) {
+        el.classList.add('bad', 'reveal');
+        el.innerHTML = `${ICON.warn}${esc(f.patternMessage || 'That value is not valid.')}`;
+        ready = false;
+      } else {
+        el.classList.add('ok', 'reveal');
+        el.innerHTML = `${ICON.ok}${f.prefix ? `Filed under ${esc(f.prefix + v)}.` : 'Looks good.'}`;
+      }
+    }
+  }
+  $('#submit-btn').disabled = !ready;
+}
+
+function openDrawer(dateId, format, trigger) {
+  if (!state.form) return;
+  const dates = datesWithOpen();
+  const date = dateId && formatsOpenOn(dateId).length ? dateId : (dates[0] && dates[0].date) || null;
+  const opts = date ? formatsOpenOn(date) : [];
+  state.pick = { date, format: opts.includes(format) ? format : (opts[0] || null) };
+  state.returnFocus = trigger || document.activeElement;
+  state.drawerOpen = true;
+  $('#form-panel').hidden = false;
+  $('#done-panel').hidden = true;
+  renderPills();
+  updateFormState();
+  $('#drawer').hidden = false;
+  $('#page').inert = true;
+  document.body.classList.add('locked');
+  const first = $('#format-pills [aria-pressed="true"]') || $('#dynamic-fields .field');
+  setTimeout(() => first && first.focus(), 60);
+}
+
+function closeDrawer() {
+  if (!state.drawerOpen) return;
+  state.drawerOpen = false;
+  $('#drawer').hidden = true;
+  $('#page').inert = false;
+  document.body.classList.remove('locked');
+  if (!$('#done-panel').hidden) $('#form-panel').reset();
+  const target = state.returnFocus && document.contains(state.returnFocus) ? state.returnFocus : $('[data-action="claim-any"]');
+  target && target.focus();
+}
+
+/** A new-issue URL with every field prefilled by its form.json id. */
+function issueUrl(values) {
+  const t = state.form.template;
+  const q = new URLSearchParams({ template: t.templateFile, title: `${t.titlePrefix}${values['talk-title']}` });
+  for (const [id, v] of Object.entries(values)) if (v) q.set(id, v);
+  return `https://github.com/${state.repo}/issues/new?${q.toString()}`;
+}
+
+function submitProposal(e) {
+  e.preventDefault();
+  if ($('#submit-btn').disabled) return;
+  const { date, format } = state.pick;
+  const values = { 'session-date': date, format: fullLabel(format) };
+  for (const f of dynamicFields()) values[f.id] = valueOf(f.id);
+
+  const url = issueUrl(values);
+  window.open(url, '_blank', 'noopener');
+
+  // The slot is only held once the issue exists, so say what happens next instead of pretending it already has.
+  const handle = values.presenter;
+  $('#done-body').innerHTML = `
+    <div class="panel">
+      <div class="done-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F6B3A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <div class="done-text">
+        <h2 tabindex="-1" id="done-title">One more step on GitHub</h2>
+        <p>Create the issue in the tab that just opened. Once it exists, the ${esc(fmt(format).label.toLowerCase())} slot on ${esc(shortDate(date))} shows as pending${handle ? ' under ' + esc(who(handle)) : ''} within a couple of minutes and stays reserved while an admin confirms. Your talk joins the agenda as soon as they do.</p>
+      </div>
+      <dl class="summary-card">
+        <div><dt>Date</dt><dd>${esc(shortDate(date))}</dd></div>
+        <div><dt>Format</dt><dd>${esc(fullLabel(format))}</dd></div>
+        <div><dt>Talk</dt><dd>${esc(values['talk-title'])}</dd></div>
+      </dl>
+      <div class="done-actions">
+        <a class="btn btn-primary" href="${esc(url)}" target="_blank" rel="noopener">Open GitHub ${ICON.out}</a>
+        <button class="btn btn-ghost" type="button" data-action="close">Back to schedule</button>
+      </div>
+      <p class="done-link">Nothing opened? Your browser may have blocked the new tab. Use “Open GitHub” above.</p>
+      <p class="done-note">Need to change something later? Edit the issue directly and the schedule follows.</p>
+    </div>`;
+  $('#form-panel').hidden = true;
+  $('#done-panel').hidden = false;
+  $('#done-title').focus();
+}
+
+/* ==========================================================
+   Events
+   ========================================================== */
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const action = el.dataset.action;
+  if (action === 'toggle') {
+    const id = el.dataset.id;
+    state.expanded = state.expanded === id ? null : id;
+    state.justExpanded = state.expanded;
+    renderList();
+    state.justExpanded = null;
+    const again = $(`[data-action="toggle"][data-id="${id}"]`);
+    again && again.focus();
+  }
+  if (action === 'claim') openDrawer(el.dataset.id, el.dataset.format, el);
+  if (action === 'claim-any') openDrawer(null, null, el);
+  if (action === 'close') closeDrawer();
+});
+
+$('#date-pills').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-date]'); if (!b) return;
+  const date = b.dataset.date;
+  const opts = formatsOpenOn(date);
+  state.pick.date = date;
+  if (!opts.includes(state.pick.format)) state.pick.format = opts[0] || null;
+  renderPills();
+  updateFormState();
+  const again = $(`#date-pills [data-date="${date}"]`);
+  again && again.focus();
+});
+$('#format-pills').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-format]'); if (!b) return;
+  state.pick.format = b.dataset.format;
+  renderPills();
+  updateFormState();
+  const again = $(`#format-pills [data-format="${state.pick.format}"]`);
+  again && again.focus();
+});
+$('#dynamic-fields').addEventListener('input', updateFormState);
+$('#form-panel').addEventListener('submit', submitProposal);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && state.drawerOpen) closeDrawer(); });
+
+/* ==========================================================
+   Boot
+   ========================================================== */
+async function getJson(url) {
+  const r = await fetch(url, { cache: 'no-store' });
+  if (!r.ok) throw new Error(`${url}: ${r.status}`);
+  return r.json();
+}
+
+function start(data, form) {
+  state.data = data;
+  state.form = form;
+  state.formats = Object.fromEntries(Object.entries(data.formats || {}).map(([k, f]) => [k, { ...f, short: f.label }]));
+  state.repo = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(data.repo || '') ? data.repo : '';
+
+  // The compiler already drops past sessions; this guards a page left open overnight.
+  const t = new Date();
+  const today = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
+  state.sessions = JSON.parse(JSON.stringify(data.sessions.filter((s) => s.date >= today)));
+  state.hero = state.sessions.find((s) => !s.cancelled) || null;
+  const firstOpen = state.sessions.find((s) => state.hero && s.date > state.hero.date && !s.cancelled && openSlots(s).length);
+  state.expanded = firstOpen ? firstOpen.date : null;
+
+  const mail = data.ospoEmail || '';
+  document.querySelectorAll('.ospo-fallback').forEach((n) => {
+    if (!/^[^@\s]+@[^@\s]+$/.test(mail)) return; // keep the generic wording until an address is configured
+    n.innerHTML = `Email <a href="mailto:${esc(mail)}">${esc(mail)}</a>`;
+  });
+  $('#repo-link').href = state.repo ? `https://github.com/${state.repo}` : '#';
+  $('#cadence').textContent = data.cadence || '';
+  buildFields();
+  $('#propose-btn').disabled = !state.repo;
+  render();
+}
+
+function showError() {
+  $('#hero').innerHTML = `<div class="notice-box"><strong>The schedule couldn't be loaded.</strong>
+    Reload the page. If you opened this file straight from disk, serve the folder instead (npm run dev) or open the published site.</div>`;
+}
+
+Promise.all([getJson(DATA_URL), getJson(FORM_URL)]).then(([d, f]) => start(d, f)).catch((err) => { console.warn(err); showError(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Every session date, listed by hand so it stays in step with the Outlook series.
+#   layout:    optional, one of the layouts in config.yml (default: default)
+#   cancelled: optional reason; the date shows as skipped and no talks can claim it
+sessions:
+  - date: 2026-10-16
+  - date: 2026-10-30
+  - date: 2026-11-13
+  - date: 2026-11-27 # day after Thanksgiving: cancel it here if the series skips it
+  - date: 2026-12-11

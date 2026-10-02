@@ -1,0 +1,22 @@
+# Settings for the Engineering CoP talk schedule. Edited by admins.
+# Changing this file rebuilds docs/data/schedule.json.
+
+repo: DSACMS/eng-cop
+timezone: America/New_York
+cadence: Every other Friday, 12:00-1:00 pm ET
+
+# Shown wherever someone without a GitHub account would hit a wall.
+ospoEmail: opensource@cms.hhs.gov
+
+roundRobinMinutes: 10
+
+formats:
+  lightning:    { label: Lightning talk, minutes: 20 }
+  presentation: { label: Presentation,   minutes: 30 }
+  full:         { label: Full session,   minutes: 50 }
+
+layouts:
+  default:      [lightning, presentation]
+  lightning:    [lightning]
+  presentation: [presentation]
+  full:         [full]

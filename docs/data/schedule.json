@@ -1,0 +1,153 @@
+{
+  "generatedAt": "2026-10-02T18:19:19Z",
+  "cadence": "Every other Friday, 12:00-1:00 pm ET",
+  "timezone": "America/New_York",
+  "repo": "DSACMS/eng-cop",
+  "ospoEmail": "opensource@cms.hhs.gov",
+  "formats": {
+    "lightning": {
+      "label": "Lightning talk",
+      "minutes": 20
+    },
+    "presentation": {
+      "label": "Presentation",
+      "minutes": 30
+    },
+    "full": {
+      "label": "Full session",
+      "minutes": 50
+    }
+  },
+  "sessions": [
+    {
+      "date": "2026-10-16",
+      "layout": "default",
+      "slots": [
+        {
+          "kind": "round-robin",
+          "from": 0,
+          "to": 10,
+          "label": "Round robin"
+        },
+        {
+          "kind": "talk",
+          "format": "lightning",
+          "from": 10,
+          "to": 30,
+          "state": "open"
+        },
+        {
+          "kind": "talk",
+          "format": "presentation",
+          "from": 30,
+          "to": 60,
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "date": "2026-10-30",
+      "layout": "default",
+      "slots": [
+        {
+          "kind": "round-robin",
+          "from": 0,
+          "to": 10,
+          "label": "Round robin"
+        },
+        {
+          "kind": "talk",
+          "format": "lightning",
+          "from": 10,
+          "to": 30,
+          "state": "open"
+        },
+        {
+          "kind": "talk",
+          "format": "presentation",
+          "from": 30,
+          "to": 60,
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "layout": "default",
+      "slots": [
+        {
+          "kind": "round-robin",
+          "from": 0,
+          "to": 10,
+          "label": "Round robin"
+        },
+        {
+          "kind": "talk",
+          "format": "lightning",
+          "from": 10,
+          "to": 30,
+          "state": "open"
+        },
+        {
+          "kind": "talk",
+          "format": "presentation",
+          "from": 30,
+          "to": 60,
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-27",
+      "layout": "default",
+      "slots": [
+        {
+          "kind": "round-robin",
+          "from": 0,
+          "to": 10,
+          "label": "Round robin"
+        },
+        {
+          "kind": "talk",
+          "format": "lightning",
+          "from": 10,
+          "to": 30,
+          "state": "open"
+        },
+        {
+          "kind": "talk",
+          "format": "presentation",
+          "from": 30,
+          "to": 60,
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "date": "2026-12-11",
+      "layout": "default",
+      "slots": [
+        {
+          "kind": "round-robin",
+          "from": 0,
+          "to": 10,
+          "label": "Round robin"
+        },
+        {
+          "kind": "talk",
+          "format": "lightning",
+          "from": 10,
+          "to": 30,
+          "state": "open"
+        },
+        {
+          "kind": "talk",
+          "format": "presentation",
+          "from": 30,
+          "to": 60,
+          "state": "open"
+        }
+      ]
+    }
+  ]
+}

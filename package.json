@@ -1,0 +1,22 @@
+{
+  "name": "eng-cop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Talk schedule for the OHTP Engineering Community of Practice",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "validate": "node scripts/sessions.mjs",
+    "build": "node scripts/build-schedule.mjs",
+    "gen:template": "node scripts/gen-issue-template.mjs",
+    "check:template": "node scripts/gen-issue-template.mjs --check",
+    "check:launch": "node scripts/check-launch.mjs",
+    "dev": "node scripts/dev-server.mjs",
+    "dev:fixture": "node scripts/dev-server.mjs --fixture",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "yaml": "^2.8.0"
+  }
+}

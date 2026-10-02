@@ -1,0 +1,52 @@
+# GENERATED from docs/form.json and config.yml by scripts/gen-issue-template.mjs.
+# Do not edit by hand: CI fails if this file differs from a fresh run.
+name: Propose a talk
+description: Take an open slot at the Engineering CoP. An admin confirms every talk before it joins the agenda.
+title: "[Talk] "
+labels:
+  - talk
+body:
+  - type: markdown
+    attributes:
+      value: "Everything on this page is public on GitHub. Use your GitHub username only, with no email addresses. Prefer the schedule site: it fills this form in for you."
+  - type: input
+    id: session-date
+    attributes:
+      label: Session date
+      description: The date of an upcoming session with an open slot, as YYYY-MM-DD.
+      placeholder: "2026-10-16"
+    validations:
+      required: true
+  - type: input
+    id: presenter
+    attributes:
+      label: GitHub username
+      description: Who is presenting. Admins filing for someone without an account may write their name here.
+      placeholder: your-handle
+    validations:
+      required: true
+  - type: input
+    id: talk-title
+    attributes:
+      label: Talk title
+      placeholder: What you'll cover, in a line
+    validations:
+      required: true
+  - type: dropdown
+    id: format
+    attributes:
+      label: Format
+      description: Must be a format open on the date you chose.
+      options:
+        - Lightning talk (20 min)
+        - Presentation (30 min)
+        - Full session (50 min)
+    validations:
+      required: true
+  - type: textarea
+    id: abstract
+    attributes:
+      label: Abstract
+      placeholder: A few sentences for the agenda.
+    validations:
+      required: false
