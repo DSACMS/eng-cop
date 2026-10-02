@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T18:19:19Z",
+  "generatedAt": "2026-10-02T18:29:57Z",
   "cadence": "Every other Friday, 12:00-1:00 pm ET",
   "timezone": "America/New_York",
   "repo": "DSACMS/eng-cop",
@@ -34,7 +34,11 @@
           "format": "lightning",
           "from": 10,
           "to": 30,
-          "state": "open"
+          "state": "pending",
+          "issue": 1,
+          "presenter": "sachin-panayil",
+          "title": "AI in the Web Browser",
+          "url": "https://github.com/DSACMS/eng-cop/issues/1"
         },
         {
           "kind": "talk",
