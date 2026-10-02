@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T18:30:09Z",
+  "generatedAt": "2026-10-02T18:54:40Z",
   "cadence": "Every other Friday, 12:00-1:00 pm ET",
   "timezone": "America/New_York",
   "repo": "DSACMS/eng-cop",
@@ -21,7 +21,6 @@
   "sessions": [
     {
       "date": "2026-10-16",
-      "cancelled": "Backed out",
       "layout": "default",
       "slots": [
         {
@@ -35,12 +34,7 @@
           "format": "lightning",
           "from": 10,
           "to": 30,
-          "state": "scheduled",
-          "issue": 1,
-          "presenter": "sachin-panayil",
-          "title": "AI in the Web Browser",
-          "abstract": "Talking about how to use WebLLM to use AI locally in the web browser",
-          "url": "https://github.com/DSACMS/eng-cop/issues/1"
+          "state": "open"
         },
         {
           "kind": "talk",
